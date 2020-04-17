@@ -1,0 +1,35 @@
+---
+- name: check the service status and start the service if stopped in Linux version 7
+  command: systemctl "{{ service_name }}" service
+  register: start_service7
+  when: ansible_distribution_version == 7 and start_service7.rc != 0 
+  notify:
+     - start service
+  tags: linux7_start_service
+
+- name: check the service status and start the service if stopped in Linux version 5 and 6
+  command: service "{{ service_name }}" status
+  register: start_service6
+  when: (ansible_distribution_version == 6 or ansible_distribution_version == 6) and start_service7.rc != 0
+  notify:
+     - start service
+  tags: linux6_start_service
+
+- name: check the service status and restart the service if already running in Linux version 7
+  command: systemctl "{{ service_name }}" service
+  register: restart_service7
+  when: ansible_distribution_version == 7 and restart_service7.rc == 0 
+  notify:
+     - restart service
+  tags: linux7_restart_service
+
+- name: check the service status and start the service if stopped in Linux version 5 and 6
+  command: service "{{ service_name }}" status
+  register: start_service6
+  when: (ansible_distribution_version == 6 or ansible_distribution_version == 6) and start_service7.rc == 0
+  notify:
+     - restart service
+  tags: linux6_restart_service
+
+
+
